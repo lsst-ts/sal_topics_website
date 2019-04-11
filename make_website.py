@@ -9,6 +9,7 @@ BUCKET_WEBSITE = f'http://{SAL_TOPIC_BUCKET}.s3-website-us-west-2.amazonaws.com'
 LSST_FONTS = 'http://fonts.googleapis.com/css?family=Raleway:subset=latin'
 OUTPUT_LOCATION = 'website'
 INDEX_FILE = 'index.html'
+LS_EXCLUDES = [INDEX_FILE, 'css', 'images', '.gitignore']
 
 def check_and_make_dirs(path):
     """Check for path existence and make all sub-directories if necessary
@@ -62,7 +63,11 @@ def get_bucket_directories(verbose):
     artifacts = collections.defaultdict(dict)
     for result in results:
         values = str(result).split()[-1].strip('\'')
-        if 'index.html' in values or values == 'b' or 'css' in values or 'images' in values:
+        exclude_match = False
+        for exclude in LS_EXCLUDES:
+            if exclude in values:
+                exclude_match = True
+        if exclude_match or values == 'b':
             continue
         items = values.split(os.sep)
         if verbose > 3:
